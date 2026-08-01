@@ -1,0 +1,61 @@
+\documentclass[12pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[brazilian]{babel}
+\usepackage{amsmath}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+
+\title{Exemplo-Modelo --- Solução da Questão 01, Capítulo 1}
+\author{ECOM028 --- Repositório de Soluções (arquivo de referência)}
+\date{}
+
+\begin{document}
+\maketitle
+
+\section*{Dados}
+\begin{align*}
+V_{oc} &= 1{,}56\,\text{V} \\
+R_{carga} &= 5\,\Omega \quad \text{(matrícula fictícia terminada em 58)}
+\end{align*}
+
+\section*{Desenvolvimento}
+
+Observando a curva ``Coppertop AA --- Constant Power'' (Capítulo 1), cada
+curva de potência constante (250, 500, 750 e 1000\,mW) descreve como a
+tensão da pilha decai ao longo do tempo de serviço, mantendo $P = V \cdot I$
+constante.
+
+Para $R_{carga} = 5\,\Omega$, buscamos a \textbf{maior} das potências-alvo
+disponíveis ($250,\ 500,\ 750,\ 1000\,\text{mW}$) tal que
+\[
+V_{op} = \sqrt{P_{alvo} \times R_{carga}}
+\]
+permaneça no intervalo $[0{,}90\,\text{V},\ 1{,}56\,\text{V}]$, respeitando
+o teto físico $V_{oc} = 1{,}56\,\text{V}$.
+
+Testando as opções, da maior para a menor:
+
+\begin{align*}
+P_{alvo} = 1000\,\text{mW} = 1\,\text{W} &\;\Rightarrow\; V_{op} = \sqrt{1 \times 5} = \sqrt{5} \approx 2{,}236\,\text{V} \quad (\text{fora da faixa}) \\
+P_{alvo} = 750\,\text{mW} = 0{,}75\,\text{W} &\;\Rightarrow\; V_{op} = \sqrt{0{,}75 \times 5} = \sqrt{3{,}75} \approx 1{,}936\,\text{V} \quad (\text{fora da faixa}) \\
+P_{alvo} = 500\,\text{mW} = 0{,}5\,\text{W} &\;\Rightarrow\; V_{op} = \sqrt{0{,}5 \times 5} = \sqrt{2{,}5} \approx 1{,}581\,\text{V} \quad (\text{fora da faixa, ligeiramente acima}) \\
+P_{alvo} = 250\,\text{mW} = 0{,}25\,\text{W} &\;\Rightarrow\; V_{op} = \sqrt{0{,}25 \times 5} = \sqrt{1{,}25} \approx 1{,}118\,\text{V} \quad (\textbf{dentro da faixa!})
+\end{align*}
+
+\section*{Resultado}
+
+\[
+\boxed{P_{alvo} = 250\,\text{mW}, \qquad V_{op} \approx 1{,}118\,\text{V}}
+\]
+
+\section*{Verificação via TyphoonSim}
+
+Ver \texttt{typhoonsim/instrucoes.md} nesta mesma pasta para o roteiro de
+verificação: monta-se a pilha real ($V_{oc}=1{,}56\,\text{V}$ em série com
+$R_{int}$) alimentando $R_{carga}=5\,\Omega$, ajustando a carga (ou a
+potência dissipada) via SCADA até igualar $250\,\text{mW}$, e lê-se $V_{op}$
+diretamente no multímetro virtual --- valor que deve bater com
+$1{,}118\,\text{V}$ dentro da tolerância de medição.
+
+\end{document}
