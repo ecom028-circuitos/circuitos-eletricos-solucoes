@@ -34,3 +34,7 @@ mantém `Vop` dentro da faixa `[0,90 V ; 1,56 V]` é `Palvo = 250 mW`.
 O arquivo `modelo.tse` (a ser criado diretamente no TyphoonSim, salvo nesta
 mesma pasta) deve conter a montagem descrita acima, pronta para ser aberta
 por qualquer colega que queira reproduzir o experimento.
+
+## Captura de tela (esquemático + painel SCADA)
+
+![Esquemático e painel de instrumentação](captura-scada.png)
