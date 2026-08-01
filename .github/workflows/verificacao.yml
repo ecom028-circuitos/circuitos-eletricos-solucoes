@@ -1,0 +1,67 @@
+name: Verificação de entrega
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  verificar-entrega:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Baixar repositório (com histórico completo)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Identificar pastas de questão alteradas nesta PR
+        id: pastas
+        run: |
+          git fetch origin main
+          ARQUIVOS=$(git diff --name-only origin/main...HEAD -- 'capitulos/**')
+          echo "Arquivos alterados:"
+          echo "$ARQUIVOS"
+          PASTAS=$(echo "$ARQUIVOS" | grep -oE '^capitulos/cap[0-9]+/alunos/[^/]+/questao-[0-9]+/' | sort -u)
+          echo "$PASTAS" > pastas_alteradas.txt
+          echo "Pastas de questao detectadas:"
+          cat pastas_alteradas.txt
+
+      - name: Checar arquivos obrigatórios
+        run: |
+          FALHOU=0
+          while read -r PASTA; do
+            [ -z "$PASTA" ] && continue
+            echo "Verificando $PASTA"
+            for ARQ in enunciado.tex solucao.tex solucao.pdf conceitos.yaml typhoonsim/modelo.tse typhoonsim/instrucoes.md; do
+              if [ ! -f "${PASTA}${ARQ}" ]; then
+                echo "::error::Arquivo obrigatorio faltando: ${PASTA}${ARQ}"
+                FALHOU=1
+              fi
+            done
+          done < pastas_alteradas.txt
+          if [ "$FALHOU" -eq 1 ]; then
+            echo "Um ou mais arquivos obrigatorios estao faltando."
+            exit 1
+          fi
+
+      - name: Instalar TeX Live (basico)
+        if: hashFiles('pastas_alteradas.txt') != ''
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y texlive-latex-base texlive-lang-portuguese texlive-latex-extra texlive-fonts-recommended
+
+      - name: Compilar cada solucao.tex alterado
+        run: |
+          FALHOU=0
+          while read -r PASTA; do
+            [ -z "$PASTA" ] && continue
+            ARQ="${PASTA}solucao.tex"
+            if [ -f "$ARQ" ]; then
+              echo "Compilando $ARQ"
+              DIR=$(dirname "$ARQ")
+              (cd "$DIR" && pdflatex -interaction=nonstopmode solucao.tex) \
+                || { echo "::error::Falha ao compilar $ARQ"; FALHOU=1; }
+            fi
+          done < pastas_alteradas.txt
+          if [ "$FALHOU" -eq 1 ]; then
+            exit 1
+          fi
