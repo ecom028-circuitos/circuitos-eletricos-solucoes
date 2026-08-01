@@ -1,0 +1,78 @@
+name: Relatório semanal de entregas
+
+on:
+  schedule:
+    # Toda segunda-feira às 08:00 (horário de Brasília, UTC-3 -> 11:00 UTC)
+    - cron: '0 11 * * 1'
+  workflow_dispatch: {}
+
+permissions:
+  issues: write
+  contents: read
+
+jobs:
+  gerar-relatorio:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Baixar repositório
+        uses: actions/checkout@v4
+
+      - name: Gerar relatório
+        run: |
+          REQUERIDOS="enunciado.tex solucao.tex solucao.pdf conceitos.yaml typhoonsim/modelo.tse typhoonsim/instrucoes.md"
+          OUT="relatorio.md"
+          echo "# Relatório semanal de entregas — $(date '+%d/%m/%Y')" > "$OUT"
+          echo "" >> "$OUT"
+
+          TOTAL_COMPLETAS=0
+          TOTAL_INCOMPLETAS=0
+
+          for CAP_DIR in capitulos/*/; do
+            CAP=$(basename "$CAP_DIR")
+            [ -d "${CAP_DIR}alunos" ] || continue
+
+            echo "## Capítulo: $CAP" >> "$OUT"
+            echo "" >> "$OUT"
+            echo "| Matrícula | Questão | Status | Arquivos faltando |" >> "$OUT"
+            echo "|---|---|---|---|" >> "$OUT"
+
+            ENCONTROU_ALUNO=0
+            for ALUNO_DIR in "${CAP_DIR}alunos"/*/; do
+              MATRICULA=$(basename "$ALUNO_DIR")
+              [ "$MATRICULA" = "EXEMPLO" ] && continue
+
+              for Q_DIR in "$ALUNO_DIR"questao-*/; do
+                [ -d "$Q_DIR" ] || continue
+                ENCONTROU_ALUNO=1
+                QUESTAO=$(basename "$Q_DIR")
+                FALTANDO=""
+                for ARQ in $REQUERIDOS; do
+                  if [ ! -f "${Q_DIR}${ARQ}" ]; then
+                    FALTANDO="$FALTANDO \`$ARQ\`"
+                  fi
+                done
+                if [ -z "$FALTANDO" ]; then
+                  echo "| $MATRICULA | $QUESTAO | Completa |  |" >> "$OUT"
+                  TOTAL_COMPLETAS=$((TOTAL_COMPLETAS+1))
+                else
+                  echo "| $MATRICULA | $QUESTAO | Incompleta |$FALTANDO |" >> "$OUT"
+                  TOTAL_INCOMPLETAS=$((TOTAL_INCOMPLETAS+1))
+                fi
+              done
+            done
+
+            if [ "$ENCONTROU_ALUNO" -eq 0 ]; then
+              echo "| _(nenhuma entrega de aluno ainda)_ | | | |" >> "$OUT"
+            fi
+            echo "" >> "$OUT"
+          done
+
+          echo "---" >> "$OUT"
+          echo "**Resumo geral:** $TOTAL_COMPLETAS entrega(s) completa(s), $TOTAL_INCOMPLETAS entrega(s) incompleta(s)." >> "$OUT"
+
+      - name: Publicar como Issue
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TITULO="Relatório semanal — $(date '+%d/%m/%Y')"
+          gh issue create --title "$TITULO" --body-file relatorio.md --label "relatorio-semanal"
