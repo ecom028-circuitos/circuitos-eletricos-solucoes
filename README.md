@@ -47,6 +47,30 @@ processo tem duas fases:
         dupla-B/
         vencedora/                       preenchida após a decisão final
 
+### Captura de tela do TyphoonSim (obrigatória)
+
+Toda pasta `typhoonsim/` de uma entrega deve conter, além do arquivo do
+modelo (`modelo.tse`) e do roteiro (`instrucoes.md`), **uma captura de
+tela** mostrando o esquemático montado e o painel SCADA em execução (com
+os valores lidos visíveis nos instrumentos virtuais).
+
+**Como adicionar:**
+
+1. Salve a captura de tela dentro da própria pasta `typhoonsim/`, com um
+   nome descritivo (ex.: `captura-scada.png`).
+2. No final do `instrucoes.md`, adicione a imagem usando a sintaxe:
+```markdown
+   ## Captura de tela (esquemático + painel SCADA)
+
+   ![Esquemático e painel de instrumentação](captura-scada.png)
+```
+3. O nome do arquivo de imagem usado no link precisa ser **idêntico**
+   (incluindo maiúsculas/minúsculas) ao nome do arquivo enviado.
+
+Essa captura serve como evidência de que a verificação experimental foi
+realizada e facilita a revisão por amostragem pelos monitores, sem que
+seja necessário abrir o TyphoonSim para conferir cada entrega.
+
 ## Como submeter sua resolução
 
 1. Crie uma nova *branch* com o padrão `capXX-suamatricula-qYY`
