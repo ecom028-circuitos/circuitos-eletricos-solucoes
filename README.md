@@ -88,3 +88,4 @@ seja necessário abrir o TyphoonSim para conferir cada entrega.
 
 *Dúvidas sobre o processo: procure o professor ou os monitores da
 disciplina.*
+
