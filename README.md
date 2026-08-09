@@ -8,7 +8,7 @@ processo tem duas fases:
 ## Fase 1 — Construção do repositório (semanal, um capítulo por vez)
 
 - A cada semana, um novo capítulo do livro-texto é trabalhado.
-- Cada aluno resolve **1 a 2 questões** desse capítulo e submete sua
+- Cada aluno resolve **1 a 3 questões** desse capítulo e submete sua
   resolução seguindo a estrutura de pastas abaixo.
 - Cada resolução deve indicar **quais conceitos da lista oficial do
   capítulo** (ver pasta `conceitos/`) foram efetivamente trabalhados na
